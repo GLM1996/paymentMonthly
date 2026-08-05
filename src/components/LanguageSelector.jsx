@@ -1,4 +1,3 @@
-
 import { Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -10,45 +9,53 @@ export default function LanguageSelector() {
     : "en";
 
   const changeLanguage = async (language) => {
+    if (language === currentLanguage) return;
+
     await i18n.changeLanguage(language);
     localStorage.setItem("mortgageLanguage", language);
   };
 
   return (
     <div
-      className="flex items-center gap-2"
+      className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 p-1 shadow-sm"
       role="group"
-      aria-label="Language selector"
+      aria-label={
+        currentLanguage === "es"
+          ? "Selector de idioma"
+          : "Language selector"
+      }
     >
-      <Languages
-        className="h-4 w-4 text-red-900"
-        aria-hidden="true"
-      />
+      <span className="flex h-7 w-7 items-center justify-center rounded-md text-red-900">
+        <Languages
+          className="h-4 w-4"
+          aria-hidden="true"
+        />
+      </span>
 
       <button
         type="button"
         onClick={() => changeLanguage("en")}
         aria-pressed={currentLanguage === "en"}
-        className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-bold transition ${
+        className={`cursor-pointer rounded-md px-2.5 py-1 text-[11px] font-bold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-800 focus-visible:ring-offset-1 ${
           currentLanguage === "en"
-            ? "bg-red-900 text-yellow-400"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            ? "bg-red-900 text-yellow-400 shadow-sm"
+            : "text-gray-600 hover:bg-white hover:text-red-900"
         }`}
       >
-        English
+        EN
       </button>
 
       <button
         type="button"
         onClick={() => changeLanguage("es")}
         aria-pressed={currentLanguage === "es"}
-        className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-bold transition ${
+        className={`cursor-pointer rounded-md px-2.5 py-1 text-[11px] font-bold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-800 focus-visible:ring-offset-1 ${
           currentLanguage === "es"
-            ? "bg-red-900 text-yellow-400"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            ? "bg-red-900 text-yellow-400 shadow-sm"
+            : "text-gray-600 hover:bg-white hover:text-red-900"
         }`}
       >
-        Español
+        ES
       </button>
     </div>
   );

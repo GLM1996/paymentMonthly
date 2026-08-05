@@ -1,54 +1,193 @@
-export function calcMonthlyPI(principal, annualRate, years) {
-  const n = years * 12;
-  const r = annualRate / 100 / 12;
-  if (n <= 0 || principal <= 0) return 0;
-  if (r === 0) return principal / n;
-  const f = Math.pow(1 + r, n);
-  return (principal * r * f) / (f - 1);
+export function calcMonthlyPI(
+  principal,
+  annualRate,
+  years,
+) {
+  const numberOfPayments = years * 12;
+  const monthlyRate = annualRate / 100 / 12;
+
+  if (
+    numberOfPayments <= 0 ||
+    principal <= 0
+  ) {
+    return 0;
+  }
+
+  if (monthlyRate === 0) {
+    return principal / numberOfPayments;
+  }
+
+  const factor = Math.pow(
+    1 + monthlyRate,
+    numberOfPayments,
+  );
+
+  return (
+    (principal * monthlyRate * factor) /
+    (factor - 1)
+  );
+}
+
+function getValueByMode({
+  value,
+  mode,
+  percentageBase,
+}) {
+  const numericValue =
+    Number.parseFloat(value) || 0;
+
+  if (mode === "amount") {
+    return numericValue;
+  }
+
+  return percentageBase * (numericValue / 100);
+}
+
+function getEffectivePercentage({
+  amount,
+  percentageBase,
+}) {
+  if (percentageBase <= 0) return 0;
+
+  return (amount / percentageBase) * 100;
 }
 
 export function calcScenarios(values) {
-  const min = parseFloat(values.minValue);
-  const max = parseFloat(values.maxValue);
-  const step = parseFloat(values.interval);
-  const years = parseFloat(values.years);
-  const rate = parseFloat(values.interestRate);
-  const downPct = parseFloat(values.downPayment);
+  const min = Number.parseFloat(values.minValue);
+  const max = Number.parseFloat(values.maxValue);
+  const step = Number.parseFloat(values.interval);
+  const years = Number.parseFloat(values.years);
+  const rate = Number.parseFloat(
+    values.interestRate,
+  );
+
   const loanType = values.loanType;
 
-  const ufmipPct = parseFloat(values.ufmip) || 1.75;
-  const taxRate = parseFloat(values.taxes) || 0.75;
-  const insuranceRate = parseFloat(values.insurance) || 0.45;
+  const taxValue =
+    Number.parseFloat(values.taxes) || 0;
+
+  const insuranceValue =
+    Number.parseFloat(values.insurance) || 0;
+
+  if (
+    !Number.isFinite(min) ||
+    !Number.isFinite(max) ||
+    !Number.isFinite(step) ||
+    !Number.isFinite(years) ||
+    !Number.isFinite(rate) ||
+    min <= 0 ||
+    max < min ||
+    step <= 0 ||
+    years <= 0 ||
+    rate < 0
+  ) {
+    return {
+      results: [],
+      summary: {
+        ...values,
+        scenarios: 0,
+      },
+    };
+  }
 
   const results = [];
   let price = min;
 
-  while (price <= max && results.length < 50) {
-    const down = price * (downPct / 100);
-    const baseLoan = price - down;
-    let upfrontMI = loanType === "FHA" ? baseLoan * (ufmipPct / 100) : 0;
-    const financed = baseLoan + upfrontMI;
+  while (
+    price <= max &&
+    results.length < 50
+  ) {
+    const down = getValueByMode({
+      value: values.downPayment,
+      mode: values.downPaymentMode,
+      percentageBase: price,
+    });
 
-    const monthlyPI = calcMonthlyPI(financed, rate, years);
+    const safeDown = Math.min(
+      Math.max(down, 0),
+      price,
+    );
 
-    const miAnnual =
+    const downPct =
+      getEffectivePercentage({
+        amount: safeDown,
+        percentageBase: price,
+      });
+
+    const baseLoan = Math.max(
+      price - safeDown,
+      0,
+    );
+
+    const upfrontMI =
       loanType === "FHA"
-        ? downPct < 10
-          ? 0.55
-          : 0.5
-        : downPct < 20
-          ? 0.75
-          : 0;
-    const monthlyMI = (baseLoan * (miAnnual / 100)) / 12;
+        ? getValueByMode({
+            value: values.ufmip,
+            mode: values.ufmipMode,
+            percentageBase: baseLoan,
+          })
+        : 0;
 
-    const monthlyTax = (price * (taxRate / 100)) / 12;
-    const monthlyInsurance = (price * (insuranceRate / 100)) / 12;
+    const financed =
+      baseLoan + upfrontMI;
 
-    const totalMonthly = monthlyPI + monthlyMI + monthlyTax + monthlyInsurance;
+    const monthlyPI = calcMonthlyPI(
+      financed,
+      rate,
+      years,
+    );
+
+    let annualMortgageInsurance = 0;
+
+    if (loanType === "FHA") {
+      annualMortgageInsurance =
+        getValueByMode({
+          value: values.fhaMip,
+          mode: values.fhaMipMode,
+          percentageBase: baseLoan,
+        });
+    }
+
+    if (
+      loanType === "CONV" &&
+      downPct < 20
+    ) {
+      annualMortgageInsurance =
+        getValueByMode({
+          value: values.conventionalPmi,
+          mode: values.conventionalPmiMode,
+          percentageBase: baseLoan,
+        });
+    }
+
+    const monthlyMI =
+      annualMortgageInsurance / 12;
+
+    const annualTaxes =
+      values.taxesMode === "amount"
+        ? taxValue
+        : price * (taxValue / 100);
+
+    const monthlyTax = annualTaxes / 12;
+
+    const annualInsurance =
+      values.insuranceMode === "amount"
+        ? insuranceValue
+        : price * (insuranceValue / 100);
+
+    const monthlyInsurance =
+      annualInsurance / 12;
+
+    const totalMonthly =
+      monthlyPI +
+      monthlyMI +
+      monthlyTax +
+      monthlyInsurance;
 
     results.push({
       price,
-      down,
+      down: safeDown,
+      downPct,
       baseLoan,
       upfrontMI,
       financed,
@@ -57,71 +196,112 @@ export function calcScenarios(values) {
       monthlyTax,
       monthlyInsurance,
       totalMonthly,
-      ltv: (baseLoan / price) * 100,
+      annualMortgageInsurance,
+      annualTaxes,
+      annualInsurance,
+      ltv:
+        price > 0
+          ? (baseLoan / price) * 100
+          : 0,
     });
 
     price += step;
   }
 
-  return { results, summary: { ...values, scenarios: results.length } };
+  return {
+    results,
+
+    summary: {
+      ...values,
+
+      downPaymentEffectivePercent:
+        results[0]?.downPct || 0,
+
+      ufmip:
+        loanType === "FHA"
+          ? values.ufmip
+          : "0",
+
+      fhaMip:
+        loanType === "FHA"
+          ? values.fhaMip
+          : "0",
+
+      conventionalPmi:
+        loanType === "CONV"
+          ? values.conventionalPmi
+          : "0",
+
+      scenarios: results.length,
+    },
+  };
 }
 
-/**
- * Agrupa los resultados en pares consecutivos para mostrar rangos
- * Ej: [200k, 250k, 300k, 350k] → [{min: 200k, max: 250k}, {min: 300k, max: 350k}]
- */
-/**
- * Agrupa los resultados en rangos consecutivos (superpuestos)
- * Ej: [200k, 250k, 300k, 350k] → [{200k-250k}, {250k-300k}, {300k-350k}]
- */
 export function groupIntoRanges(results) {
   const ranges = [];
 
-  // Iteramos hasta el penúltimo elemento para emparejar con el siguiente
-  for (let i = 0; i < results.length - 1; i++) {
-    const low = results[i];
-    const high = results[i + 1];
+  if (
+    !Array.isArray(results) ||
+    results.length < 2
+  ) {
+    return ranges;
+  }
+
+  for (
+    let index = 0;
+    index < results.length - 1;
+    index += 1
+  ) {
+    const low = results[index];
+    const high = results[index + 1];
 
     ranges.push({
       priceMin: low.price,
       priceMax: high.price,
 
-      // P&I
       piMin: low.monthlyPI,
       piMax: high.monthlyPI,
-      piDifference: high.monthlyPI - low.monthlyPI, // Diferencia entre los dos
+      piDifference:
+        high.monthlyPI - low.monthlyPI,
 
-      // Otros componentes
       miMin: low.monthlyMI,
       miMax: high.monthlyMI,
+
       taxMin: low.monthlyTax,
       taxMax: high.monthlyTax,
-      insuranceMin: low.monthlyInsurance,
-      insuranceMax: high.monthlyInsurance,
 
-      // Total
+      insuranceMin:
+        low.monthlyInsurance,
+
+      insuranceMax:
+        high.monthlyInsurance,
+
       totalMin: low.totalMonthly,
       totalMax: high.totalMonthly,
-      totalDifference: high.totalMonthly - low.totalMonthly,
+
+      totalDifference:
+        high.totalMonthly -
+        low.totalMonthly,
     });
   }
 
   return ranges;
 }
 
-export const fmt$ = (n) =>
+export const fmt$ = (number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
-  }).format(n);
+  }).format(Number(number) || 0);
 
-export const fmt$2 = (n) =>
+export const fmt$2 = (number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(n);
+  }).format(Number(number) || 0);
 
-export const fmtPct = (n) => `${n.toFixed(2)}%`;
+export const fmtPct = (number) =>
+  `${(Number(number) || 0).toFixed(2)}%`;
