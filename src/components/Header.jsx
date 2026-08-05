@@ -51,7 +51,7 @@ const Header = () => {
           <div className="flex justify-center md:justify-end">
             <div className="flex min-h-[92px] min-w-[180px] items-center justify-center border-l-0 border-red-100 px-4 md:border-l">
               <img
-                src="/logo.jpeg"
+                src={`${import.meta.env.BASE_URL}logo.jpeg`}
                 alt={t("header.logoAlt")}
                 crossOrigin="anonymous"
                 className="max-h-24 w-auto max-w-[210px] object-contain"
@@ -67,9 +67,7 @@ const Header = () => {
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-800" />
 
               <span>
-                <strong className="text-red-900">
-                  {t("header.location")}
-                </strong>
+                <strong className="text-red-900">{t("header.location")}</strong>
 
                 <span className="mx-2 text-yellow-600">•</span>
 
