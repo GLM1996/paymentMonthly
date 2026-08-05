@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+body {
+  background: #fdf8f0;
+  font-family: 'Segoe UI', sans-serif;
+}
+@media print {
+  @page {
+    size: landscape;
+    margin: 7mm;
+  }
+
+  html,
+  body {
+    background: white !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .printable-mortgage,
+  .printable-mortgage * {
+    visibility: visible !important;
+  }
+
+  .printable-mortgage {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .printable-mortgage table {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .printable-mortgage thead {
+    display: table-header-group;
+  }
+
+  .printable-mortgage tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .printable-mortgage {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
