@@ -64,7 +64,7 @@ export default function MortgageHero() {
           {/* Logo */}
           <div className="flex min-h-[88px] items-center justify-center rounded-xl border-2 border-[#e7c993] bg-white px-5 py-3 shadow-sm">
             <img
-              src={`${import.meta.env.BASE_URL}img/logo.jpeg`}
+              src={`${import.meta.env.BASE_URL}img/logo.webp`}
               alt={t(
                 "mortgageHero.logoAlt",
                 "Juan Carlos Carrera Realtors",

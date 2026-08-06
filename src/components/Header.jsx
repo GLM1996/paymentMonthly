@@ -24,7 +24,7 @@ const Header = () => {
         {/* Logo */}
         <div className="flex shrink-0 items-center justify-center">
           <img
-            src={`${import.meta.env.BASE_URL}img/logo1.jpeg`}
+            src={`${import.meta.env.BASE_URL}img/logo1.webp`}
             alt={t("headerApp.logoAlt")}
             className="h-16 w-auto max-w-[160px] object-contain md:h-20 md:max-w-[190px]"
           />

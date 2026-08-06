@@ -24,8 +24,8 @@ import { createPortal } from "react-dom";
 import { fmt$, fmt$2 } from "../utils/mortgage";
 
 // Ajusta únicamente estas dos rutas.
-import logo from "/img/logo.jpeg";
-import logo1 from "/img/logo1.jpeg";
+import logo from "/img/logo.webp";
+import logo1 from "/img/logo1.webp";
 
 function formatPercentage(value, decimals = 2) {
   const numericValue = Number(value);
