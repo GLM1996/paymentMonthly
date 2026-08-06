@@ -760,15 +760,22 @@ export default function MortgageForm({ onCalculate }) {
 
           <button
             type="submit"
-            className="uppercase mt-4 flex mx-auto cursor-pointer items-center justify-center gap-2 rounded-md bg-gradient-to-r from-[#9e7307] to-[#9e7307]  px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-[#8d060d]/20"
+            className="group uppercase relative mt-4 flex mx-auto cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-gradient-to-r from-[#790309] via-[#a60b12] to-[#790309] px-4 py-3 text-sm font-bold text-white shadow-[0_6px_18px_rgba(121,3,9,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_9px_24px_rgba(121,3,9,0.38)] focus:outline-none focus:ring-4 focus:ring-[#8d060d]/20 active:translate-y-0 active:scale-[0.99]"
           >
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 left-[-35%] w-[25%] -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[560%]"
+            />
+
             <Calculator
-              className="h-4 w-4 text-[#770707]"
+              className="relative z-10 h-4 w-4 text-[#e7c365] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
               strokeWidth={2}
               aria-hidden="true"
             />
 
-            {t("mortgageForm.calculate", "Calcular pago hipotecario")}
+            <span className="relative z-10">
+              {t("mortgageForm.calculate", "Calcular pago hipotecario")}
+            </span>
           </button>
         </div>
       </form>
