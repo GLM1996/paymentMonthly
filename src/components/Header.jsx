@@ -10,8 +10,7 @@ const Header = () => {
     <header className="mb-4 w-full border-b-[3px] border-red-800 bg-white px-4 py-3 shadow-sm md:px-6">
       <div className="grid w-full grid-cols-1 items-center gap-4 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] md:gap-6">
         {/* Title */}
-        <div className="min-w-0 text-center md:text-left">          
-
+        <div className="min-w-0 text-center md:text-left">
           <h1 className="text-xl font-extrabold uppercase leading-tight text-red-900">
             {t("headerApp.title")}
           </h1>
@@ -25,6 +24,8 @@ const Header = () => {
         <div className="flex shrink-0 items-center justify-center">
           <img
             src={`${import.meta.env.BASE_URL}img/logo1.webp`}
+            width="120"
+            height="123"
             alt={t("headerApp.logoAlt")}
             className="h-16 w-auto max-w-[160px] object-contain md:h-20 md:max-w-[190px]"
           />

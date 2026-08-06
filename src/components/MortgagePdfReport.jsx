@@ -82,6 +82,8 @@ function FooterBrand() {
 
         <img
           src={logo1}
+          width="120"
+          height="123"
           alt=""
           className="h-14 w-auto object-contain"
           crossOrigin="anonymous"
@@ -99,6 +101,8 @@ function PageHeader({ title, subtitle }) {
       <div className="flex items-start justify-between gap-6 px-8 pt-7">
         <img
           src={logo}
+          width="200"
+          height="119"
           alt={t("headerApp.logoAlt")}
           className="h-[68px] w-auto object-contain"
           crossOrigin="anonymous"

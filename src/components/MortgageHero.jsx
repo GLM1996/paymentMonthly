@@ -39,10 +39,7 @@ export default function MortgageHero() {
             />
 
             <span>
-              {t(
-                "mortgageHero.educationalTool",
-                "Herramienta educativa",
-              )}
+              {t("mortgageHero.educationalTool", "Herramienta educativa")}
             </span>
 
             <span
@@ -65,10 +62,9 @@ export default function MortgageHero() {
           <div className="flex min-h-[88px] items-center justify-center rounded-xl border-2 border-[#e7c993] bg-white px-5 py-3 shadow-sm">
             <img
               src={`${import.meta.env.BASE_URL}img/logo.webp`}
-              alt={t(
-                "mortgageHero.logoAlt",
-                "Juan Carlos Carrera Realtors",
-              )}
+              width="200"
+              height="119"
+              alt={t("mortgageHero.logoAlt", "Juan Carlos Carrera Realtors")}
               className="h-16 w-auto max-w-full object-contain"
             />
           </div>
