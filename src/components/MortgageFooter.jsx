@@ -345,7 +345,7 @@ export default function MortgageFooter() {
             {t("mortgageFooter.faqs.title")}
           </SectionTitle>
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-1">
             {faqs.map((faq, index) => (
               <FaqItem
                 key={`${faq.question}-${index}`}

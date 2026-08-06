@@ -36,13 +36,11 @@ const INITIAL_VALUES = {
 
   insurance: "0.45",
   insuranceMode: "percent",
+
+  perfectPayment: "0",
 };
 
-function ValueModeSelector({
-  mode,
-  onChange,
-  disabled = false,
-}) {
+function ValueModeSelector({ mode, onChange, disabled = false }) {
   return (
     <div className="flex shrink-0 border-l border-[#ddc798] bg-[#fffaf0]">
       <button
@@ -91,8 +89,7 @@ function MortgageInput({
   prefix,
   suffix,
 }) {
-  const supportsModes =
-    mode === "percent" || mode === "amount";
+  const supportsModes = mode === "percent" || mode === "amount";
 
   const currentPrefix = supportsModes
     ? mode === "amount"
@@ -115,10 +112,7 @@ function MortgageInput({
         <span>{label}</span>
 
         {hint && (
-          <span
-            title={hint}
-            className="inline-flex shrink-0 text-[#b5965c]"
-          >
+          <span title={hint} className="inline-flex shrink-0 text-[#b5965c]">
             <CircleHelp
               className="h-3 w-3"
               strokeWidth={2}
@@ -150,9 +144,7 @@ function MortgageInput({
           min={min}
           max={max}
           disabled={disabled}
-          onChange={(event) =>
-            onChange(field, event.target.value)
-          }
+          onChange={(event) => onChange(field, event.target.value)}
           className="min-w-0 flex-1 bg-transparent px-3 py-2 text-xs font-semibold text-[#4b423a] outline-none disabled:cursor-not-allowed disabled:text-[#99958b]"
         />
 
@@ -166,9 +158,7 @@ function MortgageInput({
           <ValueModeSelector
             mode={mode}
             disabled={disabled}
-            onChange={(newMode) =>
-              onModeChange(field, newMode)
-            }
+            onChange={(newMode) => onModeChange(field, newMode)}
           />
         )}
       </div>
@@ -176,17 +166,10 @@ function MortgageInput({
   );
 }
 
-function LoanTypeSelector({
-  isFha,
-  onChange,
-  conventionalLabel,
-  label,
-}) {
+function LoanTypeSelector({ isFha, onChange, conventionalLabel, label }) {
   return (
     <div>
-      <p className="mb-1 text-[10px] font-bold text-[#3d332b]">
-        {label}
-      </p>
+      <p className="mb-1 text-[10px] font-bold text-[#3d332b]">{label}</p>
 
       <div className="grid grid-cols-2 overflow-hidden rounded-md border border-[#d8c398] bg-white p-1">
         <button
@@ -247,10 +230,7 @@ function CalculatorBenefits() {
 
       <div className="mt-5 space-y-5">
         {benefits.map(({ icon: Icon, text }) => (
-          <div
-            key={text}
-            className="flex items-start gap-3"
-          >
+          <div key={text} className="flex items-start gap-3">
             <Icon
               className="mt-0.5 h-7 w-7 shrink-0 text-[#7f1619]"
               strokeWidth={1.9}
@@ -274,9 +254,8 @@ function CalculatorBenefits() {
         />
 
         <p className="text-xs font-semibold leading-5 text-[#493f37]">
-          El pago mensual no lo define el realtor; depende del
-          precio, el préstamo, la tasa, los impuestos, el seguro
-          y el PMI/MIP.
+          El pago mensual no lo define el realtor; depende del precio, el
+          préstamo, la tasa, los impuestos, el seguro y el PMI/MIP.
         </p>
       </div>
     </aside>
@@ -290,10 +269,7 @@ export default function MortgageForm({ onCalculate }) {
   const initialCalculationRef = useRef(false);
 
   useEffect(() => {
-    if (
-      initialCalculationRef.current ||
-      typeof onCalculate !== "function"
-    ) {
+    if (initialCalculationRef.current || typeof onCalculate !== "function") {
       return;
     }
 
@@ -323,15 +299,9 @@ export default function MortgageForm({ onCalculate }) {
       ...currentValues,
       loanType,
 
-      ufmip:
-        loanType === "FHA"
-          ? currentValues.ufmip || "1.75"
-          : "0",
+      ufmip: loanType === "FHA" ? currentValues.ufmip || "1.75" : "0",
 
-      fhaMip:
-        loanType === "FHA"
-          ? currentValues.fhaMip || "0.55"
-          : "0",
+      fhaMip: loanType === "FHA" ? currentValues.fhaMip || "0.55" : "0",
 
       conventionalPmi:
         loanType === "CONV"
@@ -358,29 +328,24 @@ export default function MortgageForm({ onCalculate }) {
       requiredFields.push("ufmip", "fhaMip");
     }
 
-    const minimumPrice =
-      Number(values.minValue) || 0;
+    const minimumPrice = Number(values.minValue) || 0;
 
     const effectiveDownPaymentPercent =
       values.downPaymentMode === "percent"
         ? Number(values.downPayment) || 0
         : minimumPrice > 0
-          ? ((Number(values.downPayment) || 0) /
-              minimumPrice) *
-            100
+          ? ((Number(values.downPayment) || 0) / minimumPrice) * 100
           : 0;
 
     const conventionalRequiresPmi =
-      values.loanType === "CONV" &&
-      effectiveDownPaymentPercent < 20;
+      values.loanType === "CONV" && effectiveDownPaymentPercent < 20;
 
     if (conventionalRequiresPmi) {
       requiredFields.push("conventionalPmi");
     }
 
     const hasEmptyField = requiredFields.some(
-      (field) =>
-        String(values[field] ?? "").trim() === "",
+      (field) => String(values[field] ?? "").trim() === "",
     );
 
     if (hasEmptyField) {
@@ -464,13 +429,11 @@ export default function MortgageForm({ onCalculate }) {
       ["insurance", "insuranceMode"],
     ];
 
-    const invalidPercentage =
-      percentageOrAmountFields.some(
-        ([field, modeField]) =>
-          values[modeField] === "percent" &&
-          (Number(values[field]) < 0 ||
-            Number(values[field]) >= 100),
-      );
+    const invalidPercentage = percentageOrAmountFields.some(
+      ([field, modeField]) =>
+        values[modeField] === "percent" &&
+        (Number(values[field]) < 0 || Number(values[field]) >= 100),
+    );
 
     if (invalidPercentage) {
       alert(
@@ -483,40 +446,32 @@ export default function MortgageForm({ onCalculate }) {
       return;
     }
 
-    const invalidAmount =
-      percentageOrAmountFields.some(
-        ([field, modeField]) =>
-          values[modeField] === "amount" &&
-          Number(values[field]) < 0,
-      );
+    const invalidAmount = percentageOrAmountFields.some(
+      ([field, modeField]) =>
+        values[modeField] === "amount" && Number(values[field]) < 0,
+    );
 
     if (invalidAmount) {
       alert(
-        t(
-          "mortgageForm.invalidAmount",
-          "Dollar amounts cannot be negative.",
-        ),
+        t("mortgageForm.invalidAmount", "Dollar amounts cannot be negative."),
       );
 
       return;
     }
-
     onCalculate({
       ...values,
 
-      ufmip:
-        values.loanType === "FHA"
-          ? values.ufmip
+      perfectPayment:
+        Number(values.perfectPayment) > 0
+          ? String(Number(values.perfectPayment))
           : "0",
 
-      fhaMip:
-        values.loanType === "FHA"
-          ? values.fhaMip
-          : "0",
+      ufmip: values.loanType === "FHA" ? values.ufmip : "0",
+
+      fhaMip: values.loanType === "FHA" ? values.fhaMip : "0",
 
       conventionalPmi:
-        values.loanType === "CONV" &&
-        conventionalRequiresPmi
+        values.loanType === "CONV" && conventionalRequiresPmi
           ? values.conventionalPmi
           : "0",
     });
@@ -524,20 +479,16 @@ export default function MortgageForm({ onCalculate }) {
 
   const isFha = values.loanType === "FHA";
 
-  const minimumPrice =
-    Number(values.minValue) || 0;
+  const minimumPrice = Number(values.minValue) || 0;
 
   const downPaymentPercent =
     values.downPaymentMode === "percent"
       ? Number(values.downPayment) || 0
       : minimumPrice > 0
-        ? ((Number(values.downPayment) || 0) /
-            minimumPrice) *
-          100
+        ? ((Number(values.downPayment) || 0) / minimumPrice) * 100
         : 0;
 
-  const requiresConventionalPmi =
-    !isFha && downPaymentPercent < 20;
+  const requiresConventionalPmi = !isFha && downPaymentPercent < 20;
 
   return (
     <div className="grid w-full grid-cols-1 items-stretch gap-3 lg:grid-cols-[minmax(0,1fr)_305px]">
@@ -556,10 +507,7 @@ export default function MortgageForm({ onCalculate }) {
 
           <div>
             <h2 className="text-sm font-extrabold uppercase tracking-wide">
-              {t(
-                "mortgageForm.stepTitle",
-                "1. Ingrese sus datos",
-              )}
+              {t("mortgageForm.stepTitle", "1. Ingrese sus datos")}
             </h2>
 
             <p className="mt-0.5 text-[10px] text-[#f6ddd4]">
@@ -576,24 +524,15 @@ export default function MortgageForm({ onCalculate }) {
             <LoanTypeSelector
               isFha={isFha}
               onChange={handleLoanTypeChange}
-              label={t(
-                "mortgageForm.loanType",
-                "Tipo de préstamo",
-              )}
-              conventionalLabel={t(
-                "mortgageForm.conventional",
-                "Convencional",
-              )}
+              label={t("mortgageForm.loanType", "Tipo de préstamo")}
+              conventionalLabel={t("mortgageForm.conventional", "Convencional")}
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
             <MortgageInput
               field="minValue"
-              label={t(
-                "mortgageForm.minimumPrice",
-                "Precio mínimo",
-              )}
+              label={t("mortgageForm.minimumPrice", "Precio mínimo")}
               value={values.minValue}
               onChange={handleChange}
               prefix="$"
@@ -607,10 +546,7 @@ export default function MortgageForm({ onCalculate }) {
 
             <MortgageInput
               field="maxValue"
-              label={t(
-                "mortgageForm.maximumPrice",
-                "Precio máximo",
-              )}
+              label={t("mortgageForm.maximumPrice", "Precio máximo")}
               value={values.maxValue}
               onChange={handleChange}
               prefix="$"
@@ -624,10 +560,7 @@ export default function MortgageForm({ onCalculate }) {
 
             <MortgageInput
               field="interval"
-              label={t(
-                "mortgageForm.priceInterval",
-                "Intervalo de precio",
-              )}
+              label={t("mortgageForm.priceInterval", "Intervalo de precio")}
               value={values.interval}
               onChange={handleChange}
               prefix="$"
@@ -641,10 +574,7 @@ export default function MortgageForm({ onCalculate }) {
 
             <MortgageInput
               field="years"
-              label={t(
-                "mortgageForm.loanTerm",
-                "Plazo del préstamo",
-              )}
+              label={t("mortgageForm.loanTerm", "Plazo del préstamo")}
               value={values.years}
               onChange={handleChange}
               hint={t(
@@ -657,27 +587,18 @@ export default function MortgageForm({ onCalculate }) {
 
             <MortgageInput
               field="interestRate"
-              label={t(
-                "mortgageForm.interestRate",
-                "Tasa de interés",
-              )}
+              label={t("mortgageForm.interestRate", "Tasa de interés")}
               value={values.interestRate}
               onChange={handleChange}
               suffix="%"
-              hint={t(
-                "mortgageForm.interestRateHint",
-                "Tasa anual estimada",
-              )}
+              hint={t("mortgageForm.interestRateHint", "Tasa anual estimada")}
               step="0.01"
               min="0"
             />
 
             <MortgageInput
               field="downPayment"
-              label={t(
-                "mortgageForm.downPayment",
-                "Pago inicial",
-              )}
+              label={t("mortgageForm.downPayment", "Pago inicial")}
               value={values.downPayment}
               onChange={handleChange}
               mode={values.downPaymentMode}
@@ -686,21 +607,14 @@ export default function MortgageForm({ onCalculate }) {
                 "mortgageForm.amountOrPercentageHint",
                 "Selecciona porcentaje o cantidad en dólares.",
               )}
-              step={
-                values.downPaymentMode === "percent"
-                  ? "0.01"
-                  : "100"
-              }
+              step={values.downPaymentMode === "percent" ? "0.01" : "100"}
               min="0"
             />
 
             {isFha ? (
               <MortgageInput
                 field="ufmip"
-                label={t(
-                  "mortgageForm.upfrontMip",
-                  "MIP inicial FHA",
-                )}
+                label={t("mortgageForm.upfrontMip", "MIP inicial FHA")}
                 value={values.ufmip}
                 onChange={handleChange}
                 mode={values.ufmipMode}
@@ -709,25 +623,14 @@ export default function MortgageForm({ onCalculate }) {
                   "mortgageForm.ufmipAmountHint",
                   "Porcentaje del préstamo base o cantidad inicial fija.",
                 )}
-                step={
-                  values.ufmipMode === "percent"
-                    ? "0.01"
-                    : "100"
-                }
+                step={values.ufmipMode === "percent" ? "0.01" : "100"}
                 min="0"
               />
             ) : (
               <MortgageInput
                 field="conventionalPmi"
-                label={t(
-                  "mortgageForm.conventionalPmi",
-                  "PMI anual",
-                )}
-                value={
-                  requiresConventionalPmi
-                    ? values.conventionalPmi
-                    : "0"
-                }
+                label={t("mortgageForm.conventionalPmi", "PMI anual")}
+                value={requiresConventionalPmi ? values.conventionalPmi : "0"}
                 onChange={handleChange}
                 mode={values.conventionalPmiMode}
                 onModeChange={handleModeChange}
@@ -742,11 +645,7 @@ export default function MortgageForm({ onCalculate }) {
                         "El PMI no es necesario con un pago inicial del 20% o más.",
                       )
                 }
-                step={
-                  values.conventionalPmiMode === "percent"
-                    ? "0.01"
-                    : "100"
-                }
+                step={values.conventionalPmiMode === "percent" ? "0.01" : "100"}
                 min="0"
                 disabled={!requiresConventionalPmi}
               />
@@ -755,10 +654,7 @@ export default function MortgageForm({ onCalculate }) {
             {isFha ? (
               <MortgageInput
                 field="fhaMip"
-                label={t(
-                  "mortgageForm.monthlyMip",
-                  "MIP anual FHA",
-                )}
+                label={t("mortgageForm.monthlyMip", "MIP anual FHA")}
                 value={values.fhaMip}
                 onChange={handleChange}
                 mode={values.fhaMipMode}
@@ -767,11 +663,7 @@ export default function MortgageForm({ onCalculate }) {
                   "mortgageForm.mipAmountHint",
                   "Porcentaje anual o cantidad anual fija de MIP.",
                 )}
-                step={
-                  values.fhaMipMode === "percent"
-                    ? "0.01"
-                    : "100"
-                }
+                step={values.fhaMipMode === "percent" ? "0.01" : "100"}
                 min="0"
               />
             ) : (
@@ -789,11 +681,7 @@ export default function MortgageForm({ onCalculate }) {
                   "mortgageForm.taxesAmountHint",
                   "Porcentaje anual o cantidad anual fija de impuestos.",
                 )}
-                step={
-                  values.taxesMode === "percent"
-                    ? "0.01"
-                    : "100"
-                }
+                step={values.taxesMode === "percent" ? "0.01" : "100"}
                 min="0"
               />
             )}
@@ -813,11 +701,7 @@ export default function MortgageForm({ onCalculate }) {
                   "mortgageForm.taxesAmountHint",
                   "Porcentaje anual o cantidad anual fija de impuestos.",
                 )}
-                step={
-                  values.taxesMode === "percent"
-                    ? "0.01"
-                    : "100"
-                }
+                step={values.taxesMode === "percent" ? "0.01" : "100"}
                 min="0"
               />
             ) : (
@@ -835,11 +719,7 @@ export default function MortgageForm({ onCalculate }) {
                   "mortgageForm.insuranceAmountHint",
                   "Porcentaje anual o prima anual fija.",
                 )}
-                step={
-                  values.insuranceMode === "percent"
-                    ? "0.01"
-                    : "100"
-                }
+                step={values.insuranceMode === "percent" ? "0.01" : "100"}
                 min="0"
               />
             )}
@@ -859,30 +739,36 @@ export default function MortgageForm({ onCalculate }) {
                   "mortgageForm.insuranceAmountHint",
                   "Porcentaje anual o prima anual fija.",
                 )}
-                step={
-                  values.insuranceMode === "percent"
-                    ? "0.01"
-                    : "100"
-                }
+                step={values.insuranceMode === "percent" ? "0.01" : "100"}
                 min="0"
               />
             )}
+            <MortgageInput
+              field="perfectPayment"
+              label={t("mortgageForm.perfectPayment", "Perfect Payment")}
+              value={values.perfectPayment}
+              onChange={handleChange}
+              prefix="$"
+              hint={t(
+                "mortgageForm.perfectPaymentHint",
+                "Pago mensual que desea resaltar en la tabla. Déjelo en 0 para no resaltar ninguna fila.",
+              )}
+              step="1"
+              min="0"
+            />
           </div>
 
           <button
             type="submit"
-            className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-gradient-to-r from-[#790309] via-[#97070d] to-[#790309] px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-[#8d060d]/20"
+            className="uppercase mt-4 flex mx-auto cursor-pointer items-center justify-center gap-2 rounded-md bg-gradient-to-r from-[#9e7307] to-[#9e7307]  px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-[#8d060d]/20"
           >
             <Calculator
-              className="h-4 w-4 text-[#e7c365]"
+              className="h-4 w-4 text-[#770707]"
               strokeWidth={2}
               aria-hidden="true"
             />
 
-            {t(
-              "mortgageForm.calculate",
-              "Calcular pago hipotecario",
-            )}
+            {t("mortgageForm.calculate", "Calcular pago hipotecario")}
           </button>
         </div>
       </form>

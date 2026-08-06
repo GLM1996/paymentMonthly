@@ -1,5 +1,4 @@
 import {
-  BadgeDollarSign,
   Banknote,
   CalendarDays,
   CircleDollarSign,
@@ -10,8 +9,8 @@ import {
   Landmark,
   Percent,
   PiggyBank,
-  ReceiptText,
-  Scale,
+  Users,
+  Calculator,
   Shield,
   ShieldCheck,
   TrendingDown,
@@ -47,21 +46,29 @@ function formatSetting(value, mode, options = {}) {
   return `${(Number(value) || 0).toFixed(decimals)}%`;
 }
 
-function SummaryItem({ icon: Icon, value, label }) {
+function SummaryItem({ icon: Icon, value, label, optional = false }) {
+  const { t } = useTranslation();
   return (
-    <div className="flex min-w-0 items-center gap-2">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8c0b12] text-white">
-        <Icon className="h-4 w-4" strokeWidth={2} />
-      </div>
+    <div className="flex min-h-[60px] flex-col items-center justify-center border-b border-r border-[#ead9b5] px-2 py-2 text-center last:border-r-0">
+      <Icon
+        className="mb-1 h-4 w-4 text-[#8c0b12]"
+        strokeWidth={2.2}
+        aria-hidden="true"
+      />
 
-      <div className="min-w-0">
-        <p className="truncate text-[11px] font-extrabold leading-tight text-[#4c4037]">
-          {value}
+      <p className="text-[7px] font-extrabold leading-tight text-[#3f352e]">
+        {label}
+      </p>
+
+      <p className="mt-1 text-[10px] font-black leading-tight text-[#3f352e]">
+        {value}
+      </p>
+
+      {optional && (
+        <p className="mt-0.5 text-[6px] font-semibold text-[#796b60]">
+          {t("mortgageForm.optional", "Opcional")}
         </p>
-        <p className="truncate text-[8px] font-semibold uppercase tracking-wide text-[#866f5f]">
-          {label}
-        </p>
-      </div>
+      )}
     </div>
   );
 }
@@ -108,10 +115,7 @@ function PageHeader({ title, subtitle }) {
           crossOrigin="anonymous"
         />
 
-        <div className="pt-1 text-right">
-          <p className="text-[8px] font-bold uppercase tracking-[0.22em] text-[#a58a62]">
-            {t("header.eyebrow")}
-          </p>
+        <div className="pt-1 text-right">        
           <p className="mt-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-[#7d6f64]">
             {t("header.disclaimer")}
           </p>
@@ -177,6 +181,18 @@ function PageOne({ summary, ranges }) {
 
   const compact = ranges.length > 10;
 
+  const perfectPayment = Number(summary.perfectPayment) || 0;
+
+  const perfectPaymentRangeIndex =
+    perfectPayment > 0
+      ? ranges.findIndex((range) => {
+          const totalMin = Number(range.totalMin) || 0;
+          const totalMax = Number(range.totalMax) || 0;
+
+          return perfectPayment >= totalMin && perfectPayment <= totalMax;
+        })
+      : -1;
+
   return (
     <article
       data-pdf-page
@@ -184,51 +200,100 @@ function PageOne({ summary, ranges }) {
     >
       <PageHeader title={t("header.title")} subtitle={t("header.subtitle")} />
 
-      <div className="mx-8 mt-5 rounded-[18px] border border-[#d8c39a] bg-white px-5 py-4 shadow-[0_6px_18px_rgba(96,68,34,0.08)]">
-        <div className="grid grid-cols-4 gap-x-5 gap-y-4">
+      <div className="mx-8 mt-5 overflow-hidden rounded-[10px] border border-[#d8c39a] bg-white">
+        <div className="flex items-center gap-2 bg-gradient-to-r from-[#790309] to-[#9e0c12] px-3 py-1.5 text-white">
+          <div className="flex h-5 w-5 items-center justify-center rounded-full border border-[#e7c365] bg-white text-[#8c0b12]">
+            <Calculator
+              className="h-3 w-3"
+              strokeWidth={2.4}
+              aria-hidden="true"
+            />
+          </div>
+
+          <h2 className="text-[9px] font-black uppercase tracking-wide">
+            {t("mortgageTable.calculatedScenario", "Escenario calculado")}
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-6">
           <SummaryItem
             icon={Home}
-            value={`${summary.loanType} · ${downPaymentLabel}`}
-            label={t("mortgageForm.downPayment")}
+            value={summary.loanType}
+            label={t("mortgageForm.loanType", "Tipo de préstamo")}
           />
+
+          <SummaryItem
+            icon={CalendarDays}
+            value={fmt$(summary.minValue)}
+            label={t("mortgageForm.minimumPrice", "Precio mínimo")}
+          />
+
+          <SummaryItem
+            icon={Home}
+            value={fmt$(summary.maxValue)}
+            label={t("mortgageForm.maximumPrice", "Precio máximo")}
+          />
+
+          <SummaryItem
+            icon={Calculator}
+            value={fmt$(summary.interval)}
+            label={t("mortgageForm.priceInterval", "Intervalo de precio")}
+          />
+
+          <SummaryItem
+            icon={CalendarDays}
+            value={`${summary.years} ${t("mortgageForm.years", "años")}`}
+            label={t("mortgageForm.loanTerm", "Plazo")}
+          />
+
           <SummaryItem
             icon={Percent}
             value={formatPercentage(summary.interestRate)}
-            label={t("mortgageTable.fixedRate")}
+            label={t("mortgageForm.interestRate", "Tasa de interés")}
           />
+
           <SummaryItem
-            icon={CalendarDays}
-            value={`${summary.years} ${t("mortgageForm.years", "years")}`}
-            label={t("mortgageTable.loanTerm")}
+            icon={PiggyBank}
+            value={downPaymentLabel}
+            label={t("mortgageForm.downPayment", "Pago inicial")}
           />
+
           <SummaryItem
             icon={ShieldCheck}
             value={upfrontMipLabel}
-            label={t("mortgageTable.upfrontMip")}
+            label={t("mortgageTable.upfrontMip", "MIP inicial FHA")}
           />
+
           <SummaryItem
             icon={Shield}
             value={mortgageInsuranceLabel}
             label={
               isFha
-                ? t("mortgageTable.annualFhaMip")
-                : t("mortgageTable.annualPmi")
+                ? t("mortgageTable.annualFhaMip", "MIP anual FHA")
+                : t("mortgageTable.annualPmi", "PMI anual")
             }
           />
+
           <SummaryItem
-            icon={ReceiptText}
+            icon={Landmark}
             value={taxesLabel}
-            label={t("mortgageTable.annualTaxes")}
+            label={t("mortgageTable.annualTaxes", "Impuestos de propiedad")}
           />
+
           <SummaryItem
             icon={WalletCards}
             value={insuranceLabel}
-            label={t("mortgageTable.annualInsurance")}
+            label={t(
+              "mortgageTable.annualInsurance",
+              "Seguro de propietario anual",
+            )}
           />
+
           <SummaryItem
-            icon={Scale}
-            value={`${fmt$(summary.minValue)} – ${fmt$(summary.maxValue)}`}
-            label={t("mortgageTable.purchasePriceRange")}
+            icon={Users}
+            value={fmt$2(summary.hoaMonthly || 0)}
+            label={t("mortgageTable.monthlyHoa", "HOA mensual")}
+            optional
           />
         </div>
       </div>
@@ -276,62 +341,102 @@ function PageOne({ summary, ranges }) {
           </thead>
 
           <tbody>
-            {ranges.map((range, index) => (
-              <tr
-                key={`${range.priceMin}-${range.priceMax}`}
-                className={index % 2 === 0 ? "bg-[#fff8e8]" : "bg-white"}
-              >
-                <td
-                  className={`whitespace-nowrap px-2 font-extrabold text-[#7d080e] ${
-                    compact ? "py-1.5" : "py-2.5"
-                  }`}
+            {ranges.map((range, index) => {
+              const isPerfectPaymentRange = index === perfectPaymentRangeIndex;
+
+              const rowBackground = isPerfectPaymentRange
+                ? "bg-[#dff4e7]"
+                : index % 2 === 0
+                  ? "bg-[#fff8e8]"
+                  : "bg-white";
+
+              const emphasizedBackground = isPerfectPaymentRange
+                ? "bg-[#c8ebd5]"
+                : "bg-[#f7e3ae]";
+
+              return (
+                <tr
+                  key={`${range.priceMin}-${range.priceMax}`}
+                  className={rowBackground}
                 >
-                  {fmt$(range.priceMin)} - {fmt$(range.priceMax)}
-                </td>
-                <td
-                  className={`whitespace-nowrap px-2 text-right ${
-                    compact ? "py-1.5" : "py-2.5"
-                  }`}
-                >
-                  {fmt$2(range.piMin)} - {fmt$2(range.piMax)}
-                </td>
-                <td
-                  className={`whitespace-nowrap bg-[#f7e3ae] px-2 text-right font-black text-[#8a1719] ${
-                    compact ? "py-1.5" : "py-2.5"
-                  }`}
-                >
-                  {fmt$2(range.piDifference)}
-                </td>
-                <td
-                  className={`whitespace-nowrap px-2 text-right ${
-                    compact ? "py-1.5" : "py-2.5"
-                  }`}
-                >
-                  {fmt$2(range.miMin)} - {fmt$2(range.miMax)}
-                </td>
-                <td
-                  className={`whitespace-nowrap px-2 text-right ${
-                    compact ? "py-1.5" : "py-2.5"
-                  }`}
-                >
-                  {fmt$2(range.taxMin)} - {fmt$2(range.taxMax)}
-                </td>
-                <td
-                  className={`whitespace-nowrap px-2 text-right ${
-                    compact ? "py-1.5" : "py-2.5"
-                  }`}
-                >
-                  {fmt$2(range.insuranceMin)} - {fmt$2(range.insuranceMax)}
-                </td>
-                <td
-                  className={`whitespace-nowrap bg-[#f7e3ae] px-2 text-right font-black text-[#7d080e] ${
-                    compact ? "py-1.5" : "py-2.5"
-                  }`}
-                >
-                  {fmt$2(range.totalMin)} - {fmt$2(range.totalMax)}
-                </td>
-              </tr>
-            ))}
+                  <td
+                    className={`whitespace-nowrap px-2 font-extrabold ${
+                      compact ? "py-1.5" : "py-2.5"
+                    } ${
+                      isPerfectPaymentRange
+                        ? "text-[#14532d]"
+                        : "text-[#7d080e]"
+                    }`}
+                  >
+                    {fmt$(range.priceMin)} - {fmt$(range.priceMax)}
+                  </td>
+
+                  <td
+                    className={`whitespace-nowrap px-2 text-right ${
+                      compact ? "py-1.5" : "py-2.5"
+                    } ${
+                      isPerfectPaymentRange ? "font-bold text-[#14532d]" : ""
+                    }`}
+                  >
+                    {fmt$2(range.piMin)} - {fmt$2(range.piMax)}
+                  </td>
+
+                  <td
+                    className={`whitespace-nowrap px-2 text-right font-black ${
+                      compact ? "py-1.5" : "py-2.5"
+                    } ${emphasizedBackground} ${
+                      isPerfectPaymentRange
+                        ? "text-[#14532d]"
+                        : "text-[#8a1719]"
+                    }`}
+                  >
+                    {fmt$2(range.piDifference)}
+                  </td>
+
+                  <td
+                    className={`whitespace-nowrap px-2 text-right ${
+                      compact ? "py-1.5" : "py-2.5"
+                    } ${
+                      isPerfectPaymentRange ? "font-bold text-[#14532d]" : ""
+                    }`}
+                  >
+                    {fmt$2(range.miMin)} - {fmt$2(range.miMax)}
+                  </td>
+
+                  <td
+                    className={`whitespace-nowrap px-2 text-right ${
+                      compact ? "py-1.5" : "py-2.5"
+                    } ${
+                      isPerfectPaymentRange ? "font-bold text-[#14532d]" : ""
+                    }`}
+                  >
+                    {fmt$2(range.taxMin)} - {fmt$2(range.taxMax)}
+                  </td>
+
+                  <td
+                    className={`whitespace-nowrap px-2 text-right ${
+                      compact ? "py-1.5" : "py-2.5"
+                    } ${
+                      isPerfectPaymentRange ? "font-bold text-[#14532d]" : ""
+                    }`}
+                  >
+                    {fmt$2(range.insuranceMin)} - {fmt$2(range.insuranceMax)}
+                  </td>
+
+                  <td
+                    className={`whitespace-nowrap px-2 text-right font-black ${
+                      compact ? "py-1.5" : "py-2.5"
+                    } ${emphasizedBackground} ${
+                      isPerfectPaymentRange
+                        ? "text-[#14532d]"
+                        : "text-[#7d080e]"
+                    }`}
+                  >
+                    {fmt$2(range.totalMin)} - {fmt$2(range.totalMax)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 

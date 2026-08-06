@@ -81,6 +81,18 @@ export default function MortgageTable({ data }) {
 
   const { results, summary } = data;
   const ranges = groupIntoRanges(results);
+
+  const perfectPayment = Number(summary.perfectPayment) || 0;
+
+  const perfectPaymentRangeIndex =
+    perfectPayment > 0
+      ? ranges.findIndex((range) => {
+          const totalMin = Number(range.totalMin) || 0;
+          const totalMax = Number(range.totalMax) || 0;
+
+          return perfectPayment >= totalMin && perfectPayment <= totalMax;
+        })
+      : -1;
   const isFha = summary.loanType === "FHA";
 
   const downPaymentLabel = formatSetting(
@@ -466,71 +478,144 @@ export default function MortgageTable({ data }) {
           <table className="w-full min-w-[1100px] border-collapse text-sm print:min-w-0 print:text-[8px]">
             <thead>
               <tr className="bg-red-900 text-yellow-400">
-                <th className="px-4 py-3 text-left font-bold print:px-2 print:py-2">
+                <th className="px-4 py-3 text-center font-bold print:px-2 print:py-2">
                   {t("mortgageTable.purchasePriceRange")}
                 </th>
 
-                <th className="px-4 py-3 text-right font-bold print:px-2 print:py-2">
+                <th className="px-4 py-3 text-center font-bold print:px-2 print:py-2">
                   {t("mortgageTable.principalInterest")}
                 </th>
 
-                <th className="px-4 py-3 text-right font-bold print:px-2 print:py-2">
+                <th className="px-4 py-3 text-center font-bold print:px-2 print:py-2">
                   {t("mortgageTable.piDifference")}
                 </th>
 
-                <th className="px-4 py-3 text-right font-bold print:px-2 print:py-2">
+                <th className="px-4 py-3 text-center font-bold print:px-2 print:py-2">
                   {t("mortgageTable.mortgageInsurance")}
                 </th>
 
-                <th className="px-4 py-3 text-right font-bold print:px-2 print:py-2">
+                <th className="px-4 py-3 text-center font-bold print:px-2 print:py-2">
                   {t("mortgageTable.propertyTaxesMonth")}
                 </th>
 
-                <th className="px-4 py-3 text-right font-bold print:px-2 print:py-2">
+                <th className="px-4 py-3 text-center font-bold print:px-2 print:py-2">
                   {t("mortgageTable.homeownersInsurance")}
                 </th>
 
-                <th className="px-4 py-3 text-right font-bold print:px-2 print:py-2">
+                <th className="px-4 py-3 text-center font-bold print:px-2 print:py-2">
                   {t("mortgageTable.totalMonthlyPayment")}
                 </th>
               </tr>
             </thead>
 
             <tbody>
-              {ranges.map((range, index) => (
-                <tr
-                  key={`${range.priceMin}-${range.priceMax}`}
-                  className={index % 2 === 0 ? "bg-yellow-50" : "bg-white"}
-                >
-                  <td className="whitespace-nowrap px-4 py-3 font-bold text-red-900 print:px-2 print:py-2">
-                    {fmt$(range.priceMin)} - {fmt$(range.priceMax)}
-                  </td>
+              {ranges.map((range, index) => {
+                const isPerfectPaymentRange =
+                  index === perfectPaymentRangeIndex;
 
-                  <td className="whitespace-nowrap px-4 py-3 text-right print:px-2 print:py-2">
-                    {fmt$2(range.piMin)} - {fmt$2(range.piMax)}
-                  </td>
+                const rowBackground = isPerfectPaymentRange
+                  ? "bg-emerald-100"
+                  : index % 2 === 0
+                    ? "bg-yellow-50"
+                    : "bg-white";
 
-                  <td className="whitespace-nowrap bg-yellow-100 px-4 py-3 text-right font-bold text-red-800 print:px-2 print:py-2">
-                    {fmt$2(range.piDifference)}
-                  </td>
+                const highlightedCellBackground = isPerfectPaymentRange
+                  ? "bg-emerald-100"
+                  : "bg-yellow-100";
 
-                  <td className="whitespace-nowrap px-4 py-3 text-right print:px-2 print:py-2">
-                    {fmt$2(range.miMin)} - {fmt$2(range.miMax)}
-                  </td>
+                return (
+                  <tr
+                    key={`${range.priceMin}-${range.priceMax}`}
+                    className={`${rowBackground} ${
+                      isPerfectPaymentRange
+                        ? "border-y-2 border-emerald-600"
+                        : ""
+                    }`}
+                  >
+                    <td
+                      className={`whitespace-nowrap px-4 py-3 text-center font-bold print:px-2 print:py-2 ${
+                        isPerfectPaymentRange
+                          ? "bg-emerald-100 text-emerald-950"
+                          : "text-red-900"
+                      }`}
+                    >
+                      {fmt$(range.priceMin)} - {fmt$(range.priceMax)}
+                    </td>
 
-                  <td className="whitespace-nowrap px-4 py-3 text-right print:px-2 print:py-2">
-                    {fmt$2(range.taxMin)} - {fmt$2(range.taxMax)}
-                  </td>
+                    <td
+                      className={`whitespace-nowrap px-4 py-3 text-center print:px-2 print:py-2 ${
+                        isPerfectPaymentRange
+                          ? "bg-emerald-100 font-bold text-emerald-950"
+                          : ""
+                      }`}
+                    >
+                      {fmt$2(range.piMin)} - {fmt$2(range.piMax)}
+                    </td>
 
-                  <td className="whitespace-nowrap px-4 py-3 text-right print:px-2 print:py-2">
-                    {fmt$2(range.insuranceMin)} - {fmt$2(range.insuranceMax)}
-                  </td>
+                    <td
+                      className={`whitespace-nowrap px-4 py-3 text-center font-bold print:px-2 print:py-2 ${
+                        highlightedCellBackground
+                      } ${
+                        isPerfectPaymentRange
+                          ? "text-emerald-950"
+                          : "text-red-800"
+                      }`}
+                    >
+                      {fmt$2(range.piDifference)}
+                    </td>
 
-                  <td className="whitespace-nowrap bg-yellow-100 px-4 py-3 text-right font-bold text-red-900 print:px-2 print:py-2">
-                    {fmt$2(range.totalMin)} - {fmt$2(range.totalMax)}
-                  </td>
-                </tr>
-              ))}
+                    <td
+                      className={`whitespace-nowrap px-4 py-3 text-center print:px-2 print:py-2 ${
+                        isPerfectPaymentRange
+                          ? "bg-emerald-100 font-bold text-emerald-950"
+                          : ""
+                      }`}
+                    >
+                      {fmt$2(range.miMin)} - {fmt$2(range.miMax)}
+                    </td>
+
+                    <td
+                      className={`whitespace-nowrap px-4 py-3 text-center print:px-2 print:py-2 ${
+                        isPerfectPaymentRange
+                          ? "bg-emerald-100 font-bold text-emerald-950"
+                          : ""
+                      }`}
+                    >
+                      {fmt$2(range.taxMin)} - {fmt$2(range.taxMax)}
+                    </td>
+
+                    <td
+                      className={`whitespace-nowrap px-4 py-3 text-center print:px-2 print:py-2 ${
+                        isPerfectPaymentRange
+                          ? "bg-emerald-100 font-bold text-emerald-950"
+                          : ""
+                      }`}
+                    >
+                      {fmt$2(range.insuranceMin)} - {fmt$2(range.insuranceMax)}
+                    </td>
+
+                    <td
+                      className={`whitespace-nowrap px-4 py-3 text-center font-bold print:px-2 print:py-2 ${
+                        highlightedCellBackground
+                      } ${
+                        isPerfectPaymentRange
+                          ? "text-emerald-950"
+                          : "text-red-900"
+                      }`}
+                    >
+                      {fmt$2(range.totalMin)} - {fmt$2(range.totalMax)}
+                      {isPerfectPaymentRange && (
+                        <div className="mt-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-800">
+                          {t(
+                            "mortgageTable.perfectPaymentRange",
+                            "Rango de pago ideal",
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
