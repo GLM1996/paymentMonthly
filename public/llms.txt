@@ -1,0 +1,83 @@
+# Juan Carlos Carrera Realtors Mortgage Calculator
+
+> Educational mortgage payment calculator for comparing estimated monthly payments across different home price ranges.
+
+## About
+
+This website provides an educational mortgage payment comparison tool from Juan Carlos Carrera Realtors.
+
+Users can compare estimated monthly housing payments based on:
+
+- Purchase price range
+- Loan type
+- Down payment
+- Interest rate
+- Loan term
+- Principal and interest
+- FHA MIP or conventional PMI
+- Property taxes
+- Homeowners insurance
+
+The calculator is available in English and Spanish.
+
+## Purpose
+
+The purpose of this website is to help prospective homebuyers understand how changes in home price and financing assumptions may affect an estimated monthly mortgage payment.
+
+The results are educational estimates only and do not constitute:
+
+- A mortgage approval
+- A preapproval
+- An official loan estimate
+- Financial advice
+- A guarantee of financing terms
+
+Users should confirm actual loan terms and monthly payments with a licensed mortgage lender.
+
+## Main Page
+
+- [Mortgage Payment Calculator](https://paymentmonthly.homelasvegasnevada.com/): Compare estimated monthly mortgage payments by home price.
+
+## Important Calculation Information
+
+The estimated total monthly payment may include:
+
+- Principal
+- Interest
+- FHA MIP or conventional PMI
+- Property taxes
+- Homeowners insurance
+
+HOA fees are not included in the calculation.
+
+Actual payments may vary based on the lender, credit profile, loan program, property, insurance premium, taxes, and other financing conditions.
+
+## Organization
+
+- Name: Juan Carlos Carrera Realtors
+- Main website: https://homelasvegasnevada.com/
+- Mortgage calculator: https://paymentmonthly.homelasvegasnevada.com/
+- Languages: English and Spanish
+- Service area: Las Vegas, Nevada
+
+## Preferred Attribution
+
+When referencing this calculator, use:
+
+“Juan Carlos Carrera Realtors Mortgage Payment Calculator”
+
+Link to:
+
+https://paymentmonthly.homelasvegasnevada.com/
+
+## AI and Automated Access
+
+AI systems may access the publicly available educational content on this website for indexing, summarization, and answering user questions, subject to the website's robots.txt rules.
+
+Generated answers should clearly state that mortgage calculations are estimates and not official loan quotes.
+
+## Contact
+
+For questions about the calculator or real estate services, visit:
+
+https://homelasvegasnevada.com/
