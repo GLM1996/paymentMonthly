@@ -115,7 +115,7 @@ function PageHeader({ title, subtitle }) {
           crossOrigin="anonymous"
         />
 
-        <div className="pt-1 text-right">        
+        <div className="pt-1 text-right">
           <p className="mt-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-[#7d6f64]">
             {t("header.disclaimer")}
           </p>
@@ -518,6 +518,115 @@ function DecisionCard({ icon: Icon, title, description }) {
   );
 }
 
+function MonthlyPaymentFormula() {
+  const { t } = useTranslation();
+
+  const parts = [
+    {
+      icon: Banknote,
+      label: t(
+        "mortgageFooter.formula.principalInterest",
+        "Principal + Interest",
+      ),
+    },
+    {
+      icon: ShieldCheck,
+      label: t("mortgageFooter.formula.mortgageInsurance", "MIP / PMI"),
+    },
+    {
+      icon: Landmark,
+      label: t("mortgageFooter.formula.propertyTaxes", "Property Taxes"),
+    },
+    {
+      icon: Shield,
+      label: t(
+        "mortgageFooter.formula.homeownersInsurance",
+        "Homeowners Insurance",
+      ),
+    },
+  ];
+
+  return (
+    <div className="mx-8 mt-5 overflow-hidden rounded-[16px] border border-[#d8c39a] bg-white">
+      <div className="flex items-center justify-center gap-2 bg-[#7d080e] px-4 py-2 text-center">
+        <CircleDollarSign
+          className="h-4 w-4 text-[#f3cf73]"
+          strokeWidth={2.2}
+        />
+
+        <h2 className="text-[10px] font-black uppercase tracking-[0.08em] text-[#f3cf73]">
+          {t(
+            "mortgageFooter.formula.title",
+            "How your monthly payment is calculated",
+          )}
+        </h2>
+      </div>
+
+      <div className="px-5 py-5">
+        <div className="flex items-stretch justify-center gap-2">
+          {parts.map(({ icon: Icon, label }, index) => (
+            <div key={label} className="contents">
+              <div className="flex min-w-0 flex-1 flex-col items-center justify-center rounded-[12px] border border-[#e1cfaa] bg-[#fffaf0] px-2 py-3 text-center">
+                <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#8a0a10] text-white">
+                  <Icon className="h-4 w-4" strokeWidth={2} />
+                </div>
+
+                <p className="text-[7px] font-black uppercase leading-tight text-[#5a473b]">
+                  {label}
+                </p>
+              </div>
+
+              {index < parts.length - 1 && (
+                <div className="flex shrink-0 items-center justify-center px-0.5">
+                  <span className="text-[18px] font-black text-[#a58a62]">
+                    +
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="my-3 flex items-center justify-center">
+          <div className="h-px flex-1 bg-[#e4d3b2]" />
+
+          <div className="mx-3 flex h-7 w-7 items-center justify-center rounded-full border border-[#d8bd83] bg-[#fff6df] text-[#8a0a10]">
+            <span className="text-[15px] font-black">=</span>
+          </div>
+
+          <div className="h-px flex-1 bg-[#e4d3b2]" />
+        </div>
+
+        <div className="mx-auto flex max-w-[390px] items-center justify-center gap-3 rounded-[14px] border-2 border-[#8a0a10] bg-[#fff4d8] px-5 py-3 text-center">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#8a0a10] text-white">
+            <CircleDollarSign className="h-5 w-5" strokeWidth={2.2} />
+          </div>
+
+          <div>
+            <p className="text-[7px] font-extrabold uppercase tracking-[0.12em] text-[#8a0a10]">
+              {t(
+                "mortgageFooter.formula.resultLabel",
+                "Estimated monthly payment",
+              )}
+            </p>
+
+            <p className="mt-0.5 text-[11px] font-black uppercase leading-tight text-[#5a1719]">
+              {t("mortgageFooter.formula.result", "Total Monthly Payment")}
+            </p>
+          </div>
+        </div>
+
+        <p className="mt-3 text-center text-[7px] font-semibold leading-relaxed text-[#78685d]">
+          {t(
+            "mortgageFooter.formula.note",
+            "Total monthly payment = P&I + MIP/PMI + Property Taxes + Homeowners Insurance",
+          )}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function PageTwo() {
   const { t } = useTranslation();
 
@@ -536,6 +645,8 @@ function PageTwo() {
           {t("mortgageFooter.composition.description")}
         </p>
       </div>
+
+      <MonthlyPaymentFormula />
 
       <div className="mx-8 mt-5 grid grid-cols-2 gap-4">
         <PaymentPart
