@@ -105,6 +105,7 @@ const resources = {
         invalidInterestRate: "The interest rate cannot be negative.",
         invalidPercentage: "Percentage values must be between 0% and 99.99%.",
         invalidAmount: "Dollar amounts cannot be negative.",
+        perfectPayment: "Comfortable Maximum Monthly Payment"
       },
 
       calculatorBenefits: {
@@ -456,6 +457,7 @@ const resources = {
         invalidInterestRate: "La tasa de interés no puede ser negativa.",
         invalidPercentage: "Los porcentajes deben estar entre 0% y 99.99%.",
         invalidAmount: "Las cantidades en dólares no pueden ser negativas.",
+        perfectPayment: "Pago Mensual Máximo que Puedo Asumir"
       },
 
       calculatorBenefits: {
