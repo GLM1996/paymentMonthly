@@ -10,7 +10,7 @@ const resources = {
   en: {
     translation: {
       headerApp: {
-        title: "Estimated Monthly Payment",
+        title: "Comfortable Maximum Monthly Payment",
         subtitle: "By Purchase Price Range",
         helpText: "If you need help using the calculator, call us at:",
         logoAlt: "Juan Carlos Carrera Realtors logo",
@@ -177,7 +177,7 @@ const resources = {
 
       header: {
         eyebrow: "Las Vegas Home Financing",
-        title: "Estimated Monthly Payment",
+        title: "Comfortable Maximum Monthly Payment",
         subtitle: "By Purchase Price Range",
         location: "",
         description:
@@ -320,7 +320,36 @@ const resources = {
               "Always confirm the exact figures with your lender before making a decision.",
           },
         },
+        formula: {
+          title: "Comfortable Maximum Monthly Payment",
 
+          principalInterest: "Principal + Interest",
+
+          mortgageInsurance: "MIP / PMI",
+
+          propertyTaxes: "Property Taxes",
+
+          homeownersInsurance: "Homeowners Insurance",
+
+          resultLabel: "Comfortable Maximum Monthly Payment",
+
+          result: "Total Monthly Payment",
+
+          note: "Total monthly payment = P&I + MIP/PMI + Property Taxes + Homeowners Insurance",
+        },
+
+        chart: {
+          title: "Monthly Payment Breakdown",
+
+          description:
+            "Estimated composition of the monthly payment for the selected scenario.",
+
+          yourPayment: "Your Payment",
+
+          tax: "Tax",
+
+          hi: "HI",
+        },
         bottomMessage:
           "Use this calculator to understand your monthly payment, compare options, and make decisions with greater clarity.",
       },
@@ -330,7 +359,7 @@ const resources = {
   es: {
     translation: {
       headerApp: {
-        title: "Pago mensual estimado",
+        title: "Pago Mensual Máximo que Puedo Asumir",
         subtitle: "Por rango de precio de compra",
         helpText:
           "Si necesitas ayuda para utilizar la calculadora, llámanos al:",
@@ -499,7 +528,7 @@ const resources = {
 
       header: {
         eyebrow: "Financiamiento de viviendas en Las Vegas",
-        title: "Pago mensual estimado",
+        title: "Pago Mensual Máximo que Puedo Asumir",
         subtitle: "Por rango de precio de compra",
         location: "",
         description:
@@ -640,6 +669,36 @@ const resources = {
             second:
               "Confirme siempre las cifras exactas con su prestamista antes de tomar una decisión.",
           },
+        },
+        formula: {
+          title: "Pago Mensual Máximo que Puedo Asumir",
+
+          principalInterest: "Principal + Interés",
+
+          mortgageInsurance: "MIP / PMI",
+
+          propertyTaxes: "Impuestos de propiedad",
+
+          homeownersInsurance: "Seguro de propietario",
+
+          resultLabel: "Pago Mensual Máximo que Puedo Asumir",
+
+          result: "Pago Mensual Total",
+
+          note: "Pago mensual total = P&I + MIP/PMI + Impuestos + Seguro de propietario",
+        },
+
+        chart: {
+          title: "Desglose del pago mensual",
+
+          description:
+            "Composición estimada del pago mensual para el escenario seleccionado.",
+
+          yourPayment: "Su Pago",
+
+          tax: "Impuestos",
+
+          hi: "Seguro",
         },
 
         bottomMessage:

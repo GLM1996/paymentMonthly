@@ -77,10 +77,10 @@ function FooterBrand() {
   const { t } = useTranslation();
 
   return (
-    <div className="mt-auto">
-      <div className="mx-auto mb-3 h-px w-[92%] bg-[#d8c29b]" />
+    <div className="absolute bottom-0 left-0 right-0 bg-[#fffdf8]">
+      <div className="mx-auto mb-2 h-px w-[92%] bg-[#d8c29b]" />
 
-      <div className="flex items-end justify-between gap-6 px-7 pb-5">
+      <div className="flex items-end justify-between gap-6 px-7 pb-4">
         <div className="max-w-[520px]">
           <p className="font-serif text-[11px] italic leading-relaxed text-[#6f5547]">
             {t("mortgageFooter.bottomMessage")}
@@ -448,31 +448,43 @@ function PageOne({ summary, ranges }) {
         </div>
       </div>
 
-      <div className="mx-8 mt-5 grid grid-cols-2 gap-4">
-        <div className="rounded-[14px] border border-[#dcc99f] bg-white p-4">
-          <div className="flex items-start gap-3">
-            <FileText className="mt-0.5 h-5 w-5 shrink-0 text-[#8a0a10]" />
-            <div>
-              <h3 className="text-[10px] font-black uppercase text-[#7d080e]">
-                {t("mortgageTable.importantNotes")}
-              </h3>
-              <p className="mt-1 text-[8px] leading-relaxed text-[#6d625a]">
-                {t("mortgageTable.noteEstimates")}
-              </p>
-            </div>
-          </div>
-        </div>
+      <div className="mx-8 mt-3 rounded-[14px] border border-[#d7c19a] bg-[#fff8e9] p-3">
+        <div className="flex items-start gap-3">
+          <HandCoins className="mt-0.5 h-5 w-5 shrink-0 text-[#8a0a10]" />
 
-        <div className="rounded-[14px] border border-[#dcc99f] bg-white p-4">
-          <div className="flex items-start gap-3">
-            <Landmark className="mt-0.5 h-5 w-5 shrink-0 text-[#8a0a10]" />
-            <div>
-              <h3 className="text-[10px] font-black uppercase text-[#7d080e]">
-                {t("mortgageFooter.notes.lender.title")}
-              </h3>
-              <p className="mt-1 text-[8px] leading-relaxed text-[#6d625a]">
-                {t("mortgageTable.noteLender")}
-              </p>
+          <div>
+            <h2 className="text-[10px] font-black uppercase text-[#7d080e]">
+              {t("mortgageFooter.notes.title")}
+            </h2>
+
+            <div className="mt-1.5 grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-[8px] font-black text-[#5f4b3d]">
+                  {t("mortgageFooter.notes.estimates.title")}
+                </p>
+
+                <p className="mt-0.5 text-[7px] leading-relaxed text-[#6d625a]">
+                  {t("mortgageFooter.notes.estimates.first")}
+                </p>
+
+                <p className="mt-0.5 text-[7px] leading-relaxed text-[#6d625a]">
+                  {t("mortgageFooter.notes.estimates.second")}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[8px] font-black text-[#5f4b3d]">
+                  {t("mortgageFooter.notes.lender.title")}
+                </p>
+
+                <p className="mt-0.5 text-[7px] leading-relaxed text-[#6d625a]">
+                  {t("mortgageFooter.notes.lender.first")}
+                </p>
+
+                <p className="mt-0.5 text-[7px] leading-relaxed text-[#6d625a]">
+                  {t("mortgageFooter.notes.lender.second")}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -627,48 +639,367 @@ function MonthlyPaymentFormula() {
   );
 }
 
-function PageTwo() {
+function PaymentBreakdownChart({ summary, ranges }) {
+  const { t } = useTranslation();
+
+  const perfectPayment = Number(summary?.perfectPayment) || 0;
+
+  const matchingRangeIndex =
+    perfectPayment > 0
+      ? ranges.findIndex((range) => {
+          const totalMin = Number(range.totalMin) || 0;
+          const totalMax = Number(range.totalMax) || 0;
+
+          return perfectPayment >= totalMin && perfectPayment <= totalMax;
+        })
+      : -1;
+
+  const selectedRange =
+    ranges[matchingRangeIndex >= 0 ? matchingRangeIndex : 0];
+
+  if (!selectedRange) {
+    return null;
+  }
+
+  const average = (min, max) => {
+    const minValue = Number(min) || 0;
+    const maxValue = Number(max) || 0;
+
+    return (minValue + maxValue) / 2;
+  };
+
+  const parts = [
+    {
+      key: "pi",
+      label: "P+I",
+      value: average(selectedRange.piMin, selectedRange.piMax),
+      color: "#8f070d",
+      textColor: "#ffffff",
+    },
+    {
+      key: "mi",
+      label: "MI",
+      value: average(selectedRange.miMin, selectedRange.miMax),
+      color: "#d2a13b",
+      textColor: "#ffffff",
+    },
+    {
+      key: "tax",
+      label: t("mortgageFooter.chart.tax", "Tax"),
+      value: average(selectedRange.taxMin, selectedRange.taxMax),
+      color: "#9c642d",
+      textColor: "#ffffff",
+    },
+    {
+      key: "insurance",
+      label: t("mortgageFooter.chart.hi", "HI"),
+      value: average(selectedRange.insuranceMin, selectedRange.insuranceMax),
+      color: "#a88c60",
+      textColor: "#ffffff",
+    },
+  ];
+
+  const paymentTotal = parts.reduce((total, part) => total + part.value, 0);
+
+  if (paymentTotal <= 0) {
+    return null;
+  }
+
+  /*
+   * SVG reducido para que PageTwo no consuma tanta altura
+   * y deje libre el espacio del FooterBrand.
+   */
+  const size = 240;
+  const center = size / 2;
+
+  const outerRadius = 94;
+  const innerRadius = 52;
+
+  const gapDegrees = 1.5;
+
+  const polarToCartesian = (cx, cy, radius, angleDegrees) => {
+    const angleRadians = ((angleDegrees - 90) * Math.PI) / 180;
+
+    return {
+      x: cx + radius * Math.cos(angleRadians),
+      y: cy + radius * Math.sin(angleRadians),
+    };
+  };
+
+  const createDonutPath = (cx, cy, outer, inner, startAngle, endAngle) => {
+    const outerStart = polarToCartesian(cx, cy, outer, endAngle);
+
+    const outerEnd = polarToCartesian(cx, cy, outer, startAngle);
+
+    const innerStart = polarToCartesian(cx, cy, inner, startAngle);
+
+    const innerEnd = polarToCartesian(cx, cy, inner, endAngle);
+
+    const angleSize = endAngle - startAngle;
+
+    const largeArcFlag = angleSize > 180 ? 1 : 0;
+
+    return [
+      `M ${outerStart.x} ${outerStart.y}`,
+      `A ${outer} ${outer} 0 ${largeArcFlag} 0 ${outerEnd.x} ${outerEnd.y}`,
+      `L ${innerStart.x} ${innerStart.y}`,
+      `A ${inner} ${inner} 0 ${largeArcFlag} 1 ${innerEnd.x} ${innerEnd.y}`,
+      "Z",
+    ].join(" ");
+  };
+
+  /*
+   * Dejamos los segmentos pequeños agrupados en la zona
+   * superior izquierda, parecido a la imagen de referencia.
+   */
+  let currentAngle = 4;
+
+  const renderedParts = parts.map((part) => {
+    const percentage = part.value / paymentTotal;
+    const rawAngle = percentage * 360;
+
+    const startAngle = currentAngle + gapDegrees / 2;
+
+    const endAngle = currentAngle + rawAngle - gapDegrees / 2;
+
+    const middleAngle = (startAngle + endAngle) / 2;
+
+    currentAngle += rawAngle;
+
+    /*
+     * P+I tiene mucho espacio, por eso el texto puede ir
+     * más centrado dentro del segmento.
+     *
+     * Los segmentos pequeños llevan el texto más cerca
+     * del borde exterior para aprovechar mejor el espacio.
+     */
+    const labelRadius = part.key === "pi" ? 76 : part.rawAngle < 18 ? 78 : 75;
+
+    const labelPosition = polarToCartesian(
+      center,
+      center,
+      labelRadius,
+      middleAngle,
+    );
+
+    return {
+      ...part,
+      rawAngle,
+      startAngle,
+      endAngle,
+      middleAngle,
+      labelX: labelPosition.x,
+      labelY: labelPosition.y,
+      path: createDonutPath(
+        center,
+        center,
+        outerRadius,
+        innerRadius,
+        startAngle,
+        endAngle,
+      ),
+    };
+  });
+
+  return (
+    <div className="mx-8 mt-3 rounded-[14px] border border-[#d8c39a] bg-white px-4 py-2.5 shadow-[0_4px_10px_rgba(96,68,34,0.05)]">
+      <div className="flex items-center justify-center gap-6">
+        <div className="shrink-0">
+          <svg
+            viewBox={`0 0 ${size} ${size}`}
+            className="h-[190px] w-[190px] overflow-visible"
+            role="img"
+            aria-label={t(
+              "mortgageFooter.chart.title",
+              "Monthly payment breakdown",
+            )}
+          >
+            {renderedParts.map((part) => (
+              <path key={part.key} d={part.path} fill={part.color} />
+            ))}
+
+            <circle
+              cx={center}
+              cy={center}
+              r={innerRadius - 1}
+              fill="#fffdf8"
+            />
+
+            {renderedParts.map((part) => {
+              const isPi = part.key === "pi";
+
+              /*
+               * Segmentos pequeños:
+               * label + valor dentro de su mismo color.
+               */
+              if (!isPi) {
+                const tinySegment = part.rawAngle < 13;
+
+                return (
+                  <g key={`${part.key}-text`}>
+                    <text
+                      x={part.labelX}
+                      y={part.labelY - (tinySegment ? 3.5 : 5)}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill={part.textColor}
+                      fontSize={tinySegment ? "5" : "6"}
+                      fontWeight="900"
+                    >
+                      {part.label}
+                    </text>
+
+                    <text
+                      x={part.labelX}
+                      y={part.labelY + (tinySegment ? 4 : 5)}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill={part.textColor}
+                      fontSize={tinySegment ? "5.5" : "6.5"}
+                      fontWeight="900"
+                    >
+                      {fmt$2(part.value)}
+                    </text>
+                  </g>
+                );
+              }
+
+              /*
+               * P+I va directamente dentro del segmento rojo.
+               */
+              return (
+                <g key={`${part.key}-text`}>
+                  <text
+                    x={part.labelX}
+                    y={part.labelY - 6}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill={part.textColor}
+                    fontSize="7"
+                    fontWeight="900"
+                  >
+                    {part.label}
+                  </text>
+
+                  <text
+                    x={part.labelX}
+                    y={part.labelY + 6}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill={part.textColor}
+                    fontSize="9"
+                    fontWeight="900"
+                  >
+                    {fmt$2(part.value)}
+                  </text>
+                </g>
+              );
+            })}
+
+            <text
+              x={center}
+              y={center - 8}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#7d080e"
+              fontSize="6.5"
+              fontWeight="900"
+              letterSpacing="0.5"
+            >
+              {t(
+                "mortgageFooter.chart.yourPayment",
+                "Your Payment",
+              ).toUpperCase()}
+            </text>
+
+            <text
+              x={center}
+              y={center + 9}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#3f352e"
+              fontSize="14"
+              fontWeight="900"
+            >
+              {fmt$2(paymentTotal)}
+            </text>
+          </svg>
+        </div>
+
+        <div className="min-w-0 max-w-[330px] flex-1">
+          <h2 className="text-[10px] font-black uppercase text-[#7d080e]">
+            {t("mortgageFooter.chart.title", "Monthly payment breakdown")}
+          </h2>
+
+          <p className="mt-1 text-[7px] leading-relaxed text-[#6d625a]">
+            {t(
+              "mortgageFooter.chart.description",
+              "Estimated composition of the monthly payment for the selected scenario.",
+            )}
+          </p>
+
+          <div className="mt-2 rounded-[10px] border border-[#ead9b5] bg-[#fffaf0] px-3 py-2">
+            <p className="text-[7px] font-bold leading-relaxed text-[#6d625a]">
+              {t(
+                "mortgageFooter.formula.note",
+                "Total monthly payment = P&I + MIP/PMI + Property Taxes + Homeowners Insurance",
+              )}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PageTwo({ summary, ranges }) {
   const { t } = useTranslation();
 
   return (
     <article
       data-pdf-page
-      className="mortgage-pdf-page flex flex-col overflow-hidden bg-[#fffdf8] text-[#4c4037]"
+      className="mortgage-pdf-page relative flex flex-col overflow-hidden bg-[#fffdf8] pb-[82px] text-[#4c4037]"
     >
       <PageHeader
         title={t("mortgageFooter.composition.title")}
         subtitle={t("header.subtitle")}
       />
 
-      <div className="mx-auto mt-4 max-w-[680px] px-8 text-center">
-        <p className="text-[10px] leading-relaxed text-[#6e6259]">
+      <div className="mx-auto mt-3 max-w-[680px] px-8 text-center">
+        <p className="text-[9px] leading-relaxed text-[#6e6259]">
           {t("mortgageFooter.composition.description")}
         </p>
       </div>
 
       <MonthlyPaymentFormula />
 
-      <div className="mx-8 mt-5 grid grid-cols-2 gap-4">
+      <PaymentBreakdownChart summary={summary} ranges={ranges} />
+
+      <div className="mx-8 mt-3 grid grid-cols-2 gap-2.5">
         <PaymentPart
           icon={PiggyBank}
           title={t("mortgageFooter.paymentParts.principal.title")}
           description={t("mortgageFooter.paymentParts.principal.description")}
         />
+
         <PaymentPart
           icon={Banknote}
           title={t("mortgageFooter.paymentParts.interest.title")}
           description={t("mortgageFooter.paymentParts.interest.description")}
         />
+
         <PaymentPart
           icon={Landmark}
           title={t("mortgageFooter.paymentParts.taxes.title")}
           description={t("mortgageFooter.paymentParts.taxes.description")}
         />
+
         <PaymentPart
           icon={Shield}
           title={t("mortgageFooter.paymentParts.insurance.title")}
           description={t("mortgageFooter.paymentParts.insurance.description")}
         />
+
         <div className="col-span-2">
           <PaymentPart
             icon={ShieldCheck}
@@ -680,26 +1011,30 @@ function PageTwo() {
         </div>
       </div>
 
-      <div className="mx-8 mt-6">
+      <div className="mx-8 mt-3">
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-[#d7c19a]" />
-          <h2 className="text-center text-[13px] font-black uppercase text-[#7d080e]">
+
+          <h2 className="text-center text-[11px] font-black uppercase text-[#7d080e]">
             {t("mortgageFooter.increases.title")}
           </h2>
+
           <div className="h-px flex-1 bg-[#d7c19a]" />
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-4">
+        <div className="mt-2 grid grid-cols-3 gap-2.5">
           <DecisionCard
             icon={TrendingUp}
             title={t("mortgageFooter.increases.morePayment.title")}
             description={t("mortgageFooter.increases.morePayment.description")}
           />
+
           <DecisionCard
             icon={TrendingDown}
             title={t("mortgageFooter.increases.lessPayment.title")}
             description={t("mortgageFooter.increases.lessPayment.description")}
           />
+
           <DecisionCard
             icon={HeartHandshake}
             title={t("mortgageFooter.increases.yourDecision.title")}
@@ -708,35 +1043,40 @@ function PageTwo() {
         </div>
       </div>
 
-      <div className="mx-8 mt-6 rounded-[16px] border border-[#d7c19a] bg-[#fff8e9] p-5">
+      <div className="mx-8 mt-3 rounded-[14px] border border-[#d7c19a] bg-[#fff8e9] p-3">
         <div className="flex items-start gap-3">
-          <HandCoins className="mt-0.5 h-6 w-6 shrink-0 text-[#8a0a10]" />
+          <HandCoins className="mt-0.5 h-5 w-5 shrink-0 text-[#8a0a10]" />
+
           <div>
-            <h2 className="text-[11px] font-black uppercase text-[#7d080e]">
+            <h2 className="text-[10px] font-black uppercase text-[#7d080e]">
               {t("mortgageFooter.notes.title")}
             </h2>
 
-            <div className="mt-2 grid grid-cols-2 gap-5">
+            <div className="mt-1.5 grid grid-cols-2 gap-4">
               <div>
-                <p className="text-[9px] font-black text-[#5f4b3d]">
+                <p className="text-[8px] font-black text-[#5f4b3d]">
                   {t("mortgageFooter.notes.estimates.title")}
                 </p>
-                <p className="mt-1 text-[8px] leading-relaxed text-[#6d625a]">
+
+                <p className="mt-0.5 text-[7px] leading-relaxed text-[#6d625a]">
                   {t("mortgageFooter.notes.estimates.first")}
                 </p>
-                <p className="mt-1 text-[8px] leading-relaxed text-[#6d625a]">
+
+                <p className="mt-0.5 text-[7px] leading-relaxed text-[#6d625a]">
                   {t("mortgageFooter.notes.estimates.second")}
                 </p>
               </div>
 
               <div>
-                <p className="text-[9px] font-black text-[#5f4b3d]">
+                <p className="text-[8px] font-black text-[#5f4b3d]">
                   {t("mortgageFooter.notes.lender.title")}
                 </p>
-                <p className="mt-1 text-[8px] leading-relaxed text-[#6d625a]">
+
+                <p className="mt-0.5 text-[7px] leading-relaxed text-[#6d625a]">
                   {t("mortgageFooter.notes.lender.first")}
                 </p>
-                <p className="mt-1 text-[8px] leading-relaxed text-[#6d625a]">
+
+                <p className="mt-0.5 text-[7px] leading-relaxed text-[#6d625a]">
                   {t("mortgageFooter.notes.lender.second")}
                 </p>
               </div>
@@ -762,7 +1102,7 @@ export default function MortgagePdfReport({ summary, ranges, reportRef }) {
     >
       <div ref={reportRef}>
         <PageOne summary={summary} ranges={ranges} />
-        <PageTwo />
+        <PageTwo summary={summary} ranges={ranges} />
       </div>
     </div>,
     document.body,

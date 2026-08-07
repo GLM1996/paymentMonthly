@@ -8,6 +8,8 @@ body {
 .mortgage-pdf-page {
   box-sizing: border-box;
 
+  position: relative;
+
   width: 816px;
   min-width: 816px;
   max-width: 816px;
@@ -15,6 +17,12 @@ body {
   height: 1056px;
   min-height: 1056px;
   max-height: 1056px;
+
+  /*
+   * Reserva fija para el FooterBrand.
+   * Evita que el contenido de PageOne llegue hasta el footer.
+   */
+  padding-bottom: 90px;
 
   overflow: hidden;
   flex: none;
